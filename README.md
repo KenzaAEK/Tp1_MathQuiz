@@ -1,8 +1,9 @@
 # 📱 MathQuiz Pro
 
-> Une application Android éducative pour s'entraîner au calcul mental de manière ludique et interactive.
+> Une application Android éducative pour s'entraîner au calcul mental de manière ludique et interactive. 
 
-<!-- Tu pourras mettre une image bannière ici si tu en as une, sinon supprime cette ligne -->
+## 🎬 Demo vidéo
+👉 [Voir la vidéo de démonstration]([https://your-link-here](https://drive.google.com/file/d/1FBR0o0WmbAH_zU0UddHUW44VR9QBt6am/view?usp=sharing))
 
 ## 📝 Description
 
