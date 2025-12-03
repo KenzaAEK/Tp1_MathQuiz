@@ -34,9 +34,7 @@ L'application intègre plusieurs fonctionnalités supplémentaires pour enrichir
 
 | **Accueil & Configuration** | **Saisie & Réflexion** | **Feedback & Historique** |
 |:-----------------------:|:------------------:|:---------------------:|
-| <img src="screenshots/home.png" width="200"/> | <img src="screenshots/input.png" width="200"/> | <img src="screenshots/result.png" width="200"/> |
-
-*(Note : Assurez-vous d'ajouter vos captures d'écran dans un dossier `screenshots/` à la racine du projet)*
+| <img src="home.png" width="200"/> | <img src="input.png" width="200"/> | <img src="result.png" width="200"/> |
 
 ## 🛠️ Architecture Technique
 
