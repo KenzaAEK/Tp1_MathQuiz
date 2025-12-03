@@ -1,52 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material Design 3 - Blue/Orange Theme -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
 
-    <!-- Primary Colors (Blue) -->
+    <!-- App Theme Colors -->
     <color name="primary_blue">#2196F3</color>
-    <color name="primary_blue_dark">#1976D2</color>
-    <color name="primary_blue_light">#BBDEFB</color>
-    <color name="primary_blue_variant">#0D47A1</color>
-
-    <!-- Secondary Colors (Orange) -->
+    <color name="primary_dark">#1976D2</color>
     <color name="secondary_orange">#FF9800</color>
-    <color name="secondary_orange_dark">#F57C00</color>
     <color name="secondary_orange_light">#FFE0B2</color>
 
-    <!-- Background & Surface -->
-    <color name="background_main">#F5F7FA</color>
+    <!-- Backgrounds -->
+    <color name="background_main">#F5F5F5</color>
     <color name="surface_white">#FFFFFF</color>
-    <color name="surface_card">#FAFBFC</color>
 
     <!-- Text Colors -->
-    <color name="text_primary">#1A1A1A</color>
-    <color name="text_secondary">#616161</color>
-    <color name="text_hint">#9E9E9E</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
     <color name="text_white">#FFFFFF</color>
 
-    <!-- Operation Button Colors -->
-    <color name="btn_add_bg">#4CAF50</color>
-    <color name="btn_add_pressed">#388E3C</color>
-    <color name="btn_subtract_bg">#F44336</color>
-    <color name="btn_subtract_pressed">#D32F2F</color>
-    <color name="btn_multiply_bg">#9C27B0</color>
-    <color name="btn_multiply_pressed">#7B1FA2</color>
+    <!-- Button Colors -->
+    <color name="btn_add_bg">#4CAF50</color>      <!-- Green -->
+    <color name="btn_subtract_bg">#F44336</color> <!-- Red -->
+    <color name="btn_multiply_bg">#9C27B0</color> <!-- Purple -->
 
-    <!-- Status Colors -->
-    <color name="success_green">#4CAF50</color>
-    <color name="error_red">#F44336</color>
-    <color name="warning_amber">#FFC107</color>
-    <color name="info_blue">#2196F3</color>
-
-    <!-- Shadow & Elevation -->
-    <color name="shadow_light">#1A000000</color>
-    <color name="shadow_medium">#33000000</color>
-
-    <!-- Dividers & Borders -->
-    <color name="divider">#E0E0E0</color>
-    <color name="border_light">#EEEEEE</color>
-
-    <!-- Gradient Colors -->
-    <color name="gradient_start">#2196F3</color>
-    <color name="gradient_end">#FF9800</color>
+    <!-- Feedback Colors -->
+    <color name="correct_green">#2E7D32</color>
+    <color name="wrong_red">#D32F2F</color>
 </resources>

@@ -2,397 +2,274 @@ package com.example.tp1_mathquiz;
 
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.BounceInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.tp1_mathquiz.R;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-/**
- * MainActivity - Application MathQuiz
- *
- * Application de quiz mathématique avec :
- * - Génération aléatoire de nombres
- * - Opérations arithmétiques (+, -, ×)
- * - Système de score avec sauvegarde
- * - Niveaux de difficulté (Facile/Moyen/Difficile)
- * - Historique des 5 dernières opérations
- * - Animations et feedback visuel
- *
- * @author ABOU-EL KASEM
- * @version 1.0
- */
 public class MainActivity extends AppCompatActivity {
 
-    // ==================== CONSTANTES ====================
-
-    /** Clé pour la sauvegarde du score dans SharedPreferences */
-    private static final String PREFS_NAME = "MathQuizPrefs";
-    private static final String KEY_SCORE = "score";
-
-    /** Nombre maximum d'éléments dans l'historique */
-    private static final int MAX_HISTORY_SIZE = 5;
-
-    /** Points gagnés par bonne réponse */
-    private static final int POINTS_PER_CORRECT = 10;
-
-    // ==================== ENUM POUR LES NIVEAUX ====================
-
-    /**
-     * Énumération des niveaux de difficulté
-     * Chaque niveau définit les bornes min/max pour la génération de nombres
-     */
-    private enum Difficulty {
-        EASY(11, 99),      // Facile : 11-99
-        MEDIUM(111, 999),  // Moyen : 111-999
-        HARD(1111, 9999);  // Difficile : 1111-9999
-
-        final int min;
-        final int max;
-
-        Difficulty(int min, int max) {
-            this.min = min;
-            this.max = max;
-        }
-    }
-
-    // ==================== VARIABLES D'INSTANCE ====================
-
-    // Composants UI
+    // ==================== VARIABLES ====================
     private TextView tvNumber1, tvNumber2, tvResult, tvOperationSymbol, tvScore, tvHistory;
-    private Button btnAdd, btnSubtract, btnMultiply, btnGenerate, btnResetScore;
+    private EditText etUserGuess;
+    private Button btnAdd, btnSubtract, btnMultiply, btnGenerate, btnResetScore, btnValidate;
     private Spinner spinnerDifficulty;
 
-    // Variables métier
-    private int number1, number2;              // Les deux nombres affichés
-    private int currentScore = 0;              // Score actuel
-    private Difficulty currentDifficulty = Difficulty.MEDIUM;  // Niveau par défaut
-    private ArrayList<String> history;         // Historique des opérations
-    private Random random;                     // Générateur aléatoire
-    private SharedPreferences prefs;           // Sauvegarde persistante
+    private int number1, number2;
+    private int currentScore = 0;
 
-    // ==================== CYCLE DE VIE ====================
+    // NEW: We need to remember which operation the user selected
+    private Character selectedOperation = null; // null means no operation selected yet
 
-    /**
-     * Initialisation de l'activité
-     * Configuration de tous les composants et listeners
-     */
+    // Constants
+    private static final String PREFS_NAME = "MathQuizPrefs";
+    private static final String KEY_SCORE = "score";
+    private static final int MAX_HISTORY_SIZE = 5;
+
+    // Data structures
+    private ArrayList<String> history;
+    private Random random;
+    private SharedPreferences prefs;
+
+    // Difficulty Levels
+    private enum Difficulty {
+        EASY(11, 99),
+        MEDIUM(111, 999),
+        HARD(1111, 9999);
+        final int min, max;
+        Difficulty(int min, int max) { this.min = min; this.max = max; }
+    }
+    private Difficulty currentDifficulty = Difficulty.MEDIUM;
+
+    // ==================== LIFECYCLE ====================
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialisation des composants
         initializeComponents();
-
-        // Chargement du score sauvegardé
         loadScore();
-
-        // Configuration des événements
         setupListeners();
-
-        // Génération du premier exercice
         generateNewExercise();
     }
 
-    /**
-     * Sauvegarde du score avant la destruction de l'activité
-     */
     @Override
     protected void onPause() {
         super.onPause();
         saveScore();
     }
 
-    // ==================== INITIALISATION ====================
-
-    /**
-     * Initialise tous les composants UI et objets métier
-     */
+    // ==================== SETUP ====================
     private void initializeComponents() {
-        // Récupération des vues
         tvNumber1 = findViewById(R.id.tvNumber1);
         tvNumber2 = findViewById(R.id.tvNumber2);
         tvResult = findViewById(R.id.tvResult);
         tvOperationSymbol = findViewById(R.id.tvOperationSymbol);
         tvScore = findViewById(R.id.tvScore);
         tvHistory = findViewById(R.id.tvHistory);
+        etUserGuess = findViewById(R.id.etUserGuess);
 
         btnAdd = findViewById(R.id.btnAdd);
         btnSubtract = findViewById(R.id.btnSubtract);
         btnMultiply = findViewById(R.id.btnMultiply);
         btnGenerate = findViewById(R.id.btnGenerate);
         btnResetScore = findViewById(R.id.btnResetScore);
+        btnValidate = findViewById(R.id.btnValidate);
 
         spinnerDifficulty = findViewById(R.id.spinnerDifficulty);
 
-        // Initialisation des objets métier
         random = new Random();
         history = new ArrayList<>();
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
-        // Configuration du Spinner de difficulté
         setupDifficultySpinner();
     }
 
-    /**
-     * Configure le Spinner pour la sélection du niveau de difficulté
-     */
     private void setupDifficultySpinner() {
         String[] difficulties = {
                 getString(R.string.difficulty_easy),
                 getString(R.string.difficulty_medium),
                 getString(R.string.difficulty_hard)
         };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_spinner_item,
-                difficulties
-        );
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, difficulties);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDifficulty.setAdapter(adapter);
-        spinnerDifficulty.setSelection(1); // Moyen par défaut
+        spinnerDifficulty.setSelection(1);
     }
 
-    /**
-     * Configure tous les listeners d'événements
-     */
     private void setupListeners() {
-        // Boutons d'opérations
-        btnAdd.setOnClickListener(v -> performOperation('+'));
-        btnSubtract.setOnClickListener(v -> performOperation('-'));
-        btnMultiply.setOnClickListener(v -> performOperation('×'));
+        // STEP 1: Select Operation
+        // These buttons ONLY set the operation, they do not check the answer yet.
+        btnAdd.setOnClickListener(v -> selectOperation('+'));
+        btnSubtract.setOnClickListener(v -> selectOperation('-'));
+        btnMultiply.setOnClickListener(v -> selectOperation('×'));
 
-        // Bouton de génération
+        // STEP 2: Validate Answer
+        btnValidate.setOnClickListener(v -> checkAnswer());
+
         btnGenerate.setOnClickListener(v -> {
             generateNewExercise();
             showToast(getString(R.string.toast_new_exercise));
         });
 
-        // Bouton de réinitialisation du score
         btnResetScore.setOnClickListener(v -> resetScore());
 
-        // Changement de difficulté
         spinnerDifficulty.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 currentDifficulty = Difficulty.values()[position];
                 generateNewExercise();
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
-    // ==================== LOGIQUE MÉTIER ====================
-
-    /**
-     * Génère deux nouveaux nombres aléatoires selon le niveau de difficulté
-     */
+    // ==================== CORE LOGIC ====================
     private void generateNewExercise() {
-        number1 = generateRandomNumber(currentDifficulty);
-        number2 = generateRandomNumber(currentDifficulty);
+        number1 = random.nextInt(currentDifficulty.max - currentDifficulty.min + 1) + currentDifficulty.min;
+        number2 = random.nextInt(currentDifficulty.max - currentDifficulty.min + 1) + currentDifficulty.min;
 
-        // Mise à jour de l'interface
         tvNumber1.setText(String.valueOf(number1));
         tvNumber2.setText(String.valueOf(number2));
+
+        // RESET State
+        selectedOperation = null; // No operation selected
         tvOperationSymbol.setText("?");
         tvResult.setText(getString(R.string.tv_result_placeholder));
+        tvResult.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
 
-        // Animation d'apparition des nombres
+        // CLEAR input
+        etUserGuess.setText("");
+        etUserGuess.setError(null);
+
         animateView(tvNumber1);
         animateView(tvNumber2);
     }
 
-    /**
-     * Génère un nombre aléatoire dans les bornes du niveau de difficulté
-     *
-     * @param difficulty Le niveau de difficulté
-     * @return Un nombre aléatoire
-     */
-    private int generateRandomNumber(Difficulty difficulty) {
-        return random.nextInt(difficulty.max - difficulty.min + 1) + difficulty.min;
+    // Called when user clicks +, -, or x
+    private void selectOperation(char operation) {
+        selectedOperation = operation;
+        tvOperationSymbol.setText(String.valueOf(operation));
+
+        // Optional: clear any previous error if they change operation
+        if (tvResult.getCurrentTextColor() == ContextCompat.getColor(this, R.color.wrong_red)) {
+            tvResult.setText(getString(R.string.tv_result_placeholder));
+            tvResult.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+        }
     }
 
-    /**
-     * Effectue l'opération mathématique sélectionnée
-     *
-     * @param operation Le symbole de l'opération (+, -, ×)
-     */
-    private void performOperation(char operation) {
-        int result = 0;
+    // Called when user clicks the Checkmark button
+    private void checkAnswer() {
+        // 1. Did they select an operation?
+        if (selectedOperation == null) {
+            showToast("Veuillez d'abord sélectionner une opération (+, -, ×)");
+            return;
+        }
+
+        // 2. Did they enter a guess?
+        String userGuessStr = etUserGuess.getText().toString();
+        if (userGuessStr.isEmpty()) {
+            showToast("Veuillez entrer votre réponse !");
+            etUserGuess.setError("Réponse requise");
+            return;
+        }
+
+        // 3. Calculate based on the SELECTED operation
+        int realResult = 0;
         String operationStr = "";
 
-        // Calcul selon l'opération
-        switch (operation) {
-            case '+':
-                result = number1 + number2;
-                operationStr = "+";
-                break;
-            case '-':
-                result = number1 - number2;
-                operationStr = "−";
-                break;
-            case '×':
-                result = number1 * number2;
-                operationStr = "×";
-                break;
+        switch (selectedOperation) {
+            case '+': realResult = number1 + number2; operationStr = "+"; break;
+            case '-': realResult = number1 - number2; operationStr = "-"; break;
+            case '×': realResult = number1 * number2; operationStr = "×"; break;
         }
 
-        // Mise à jour de l'interface
-        tvOperationSymbol.setText(String.valueOf(operation));
-        tvResult.setText(getString(R.string.result_format, result));
-
-        // Animation du résultat
-        animateView(tvResult);
-
-        // Mise à jour du score (simulation d'une bonne réponse automatique)
-        updateScore(POINTS_PER_CORRECT);
-
-        // Ajout à l'historique
-        addToHistory(number1, operationStr, number2, result);
-
-        // Feedback visuel positif
-        flashResultBackground(true);
-    }
-
-    /**
-     * Ajoute une opération à l'historique
-     * Limite l'historique à MAX_HISTORY_SIZE éléments
-     *
-     * @param num1 Premier nombre
-     * @param op Opération
-     * @param num2 Deuxième nombre
-     * @param result Résultat
-     */
-    private void addToHistory(int num1, String op, int num2, int result) {
-        String entry = String.format("%d %s %d = %d", num1, op, num2, result);
-
-        // Ajout en début de liste
-        history.add(0, entry);
-
-        // Limitation à 5 éléments
-        if (history.size() > MAX_HISTORY_SIZE) {
-            history.remove(MAX_HISTORY_SIZE);
-        }
-
-        // Mise à jour de l'affichage
-        updateHistoryDisplay();
-    }
-
-    /**
-     * Met à jour l'affichage de l'historique
-     */
-    private void updateHistoryDisplay() {
-        if (history.isEmpty()) {
-            tvHistory.setText(getString(R.string.history_empty));
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < history.size(); i++) {
-                sb.append((i + 1)).append(". ").append(history.get(i));
-                if (i < history.size() - 1) {
-                    sb.append("\n");
-                }
+        // 4. Validate
+        try {
+            int userGuess = Integer.parseInt(userGuessStr);
+            if (userGuess == realResult) {
+                // Correct
+                updateScore(10);
+                showToast("Bravo ! Bonne réponse !");
+                tvResult.setTextColor(ContextCompat.getColor(this, R.color.correct_green));
+                tvResult.setText("Correct ! (" + realResult + ")");
+            } else {
+                // Wrong
+                showToast("Raté !");
+                tvResult.setTextColor(ContextCompat.getColor(this, R.color.wrong_red));
+                tvResult.setText("Raté ! Réponse : " + realResult);
             }
-            tvHistory.setText(sb.toString());
+        } catch (NumberFormatException e) {
+            showToast("Format invalide");
+            return;
         }
+
+        etUserGuess.setError(null);
+        animateView(tvResult);
+        addToHistory(number1, operationStr, number2, realResult);
     }
 
-    // ==================== GESTION DU SCORE ====================
-
-    /**
-     * Met à jour le score et l'affiche
-     *
-     * @param points Points à ajouter
-     */
+    // ==================== UTILS ====================
     private void updateScore(int points) {
         currentScore += points;
         tvScore.setText(String.valueOf(currentScore));
         animateView(tvScore);
     }
 
-    /**
-     * Réinitialise le score à zéro
-     */
+    private void addToHistory(int n1, String op, int n2, int res) {
+        String entry = String.format("%d %s %d = %d", n1, op, n2, res);
+        history.add(0, entry);
+        if (history.size() > MAX_HISTORY_SIZE) history.remove(MAX_HISTORY_SIZE);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < history.size(); i++) {
+            sb.append(i + 1).append(". ").append(history.get(i)).append("\n");
+        }
+        tvHistory.setText(sb.toString().trim());
+    }
+
     private void resetScore() {
         currentScore = 0;
         tvScore.setText("0");
         history.clear();
-        updateHistoryDisplay();
+        tvHistory.setText(getString(R.string.history_empty));
         saveScore();
         showToast(getString(R.string.toast_score_reset));
+
+        // Also reset current game
+        generateNewExercise();
     }
 
-    /**
-     * Charge le score depuis SharedPreferences
-     */
+    private void saveScore() {
+        prefs.edit().putInt(KEY_SCORE, currentScore).apply();
+    }
+
     private void loadScore() {
         currentScore = prefs.getInt(KEY_SCORE, 0);
         tvScore.setText(String.valueOf(currentScore));
     }
 
-    /**
-     * Sauvegarde le score dans SharedPreferences
-     */
-    private void saveScore() {
-        prefs.edit().putInt(KEY_SCORE, currentScore).apply();
-    }
-
-    // ==================== ANIMATIONS & UI ====================
-
-    /**
-     * Anime une vue avec un effet de rebond
-     *
-     * @param view La vue à animer
-     */
     private void animateView(View view) {
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "scaleX", 0.8f, 1.1f, 1f);
         ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, "scaleY", 0.8f, 1.1f, 1f);
-
-        scaleX.setDuration(400);
-        scaleY.setDuration(400);
-        scaleX.setInterpolator(new BounceInterpolator());
-        scaleY.setInterpolator(new BounceInterpolator());
-
-        scaleX.start();
-        scaleY.start();
+        scaleX.setDuration(400); scaleY.setDuration(400);
+        scaleX.setInterpolator(new BounceInterpolator()); scaleY.setInterpolator(new BounceInterpolator());
+        scaleX.start(); scaleY.start();
     }
 
-    /**
-     * Flash de couleur sur le résultat (vert pour correct)
-     *
-     * @param isCorrect True si la réponse est correcte
-     */
-    private void flashResultBackground(boolean isCorrect) {
-        int color = isCorrect ? Color.parseColor("#4CAF50") : Color.parseColor("#F44336");
-        tvResult.setTextColor(color);
-
-        // Retour à la couleur normale après 500ms
-        tvResult.postDelayed(() -> {
-            tvResult.setTextColor(getResources().getColor(R.color.text_primary));
-        }, 500);
-    }
-
-    /**
-     * Affiche un Toast court
-     *
-     * @param message Le message à afficher
-     */
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    private void showToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 }

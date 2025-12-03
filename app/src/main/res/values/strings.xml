@@ -1,44 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App Information -->
-    <string name="app_name">MathQuiz Pro</string>
-
-    <!-- Main Screen Labels -->
+    <string name="app_name">MathQuiz</string>
     <string name="tv_title">Quiz Mathématique</string>
     <string name="tv_score_label">Score :</string>
-    <string name="tv_result_placeholder">Sélectionnez une opération</string>
-    <string name="tv_difficulty_label">Niveau :</string>
-    <string name="tv_history_label">Historique</string>
-
-    <!-- Buttons -->
-    <string name="btn_add">+</string>
-    <string name="btn_subtract">−</string>
-    <string name="btn_multiply">×</string>
-    <string name="btn_generate">Générer</string>
-    <string name="btn_reset_score">Réinitialiser</string>
 
     <!-- Difficulty Levels -->
-    <string name="difficulty_easy">Facile</string>
-    <string name="difficulty_medium">Moyen</string>
-    <string name="difficulty_hard">Difficile</string>
+    <string name="difficulty_easy">Facile (11-99)</string>
+    <string name="difficulty_medium">Moyen (111-999)</string>
+    <string name="difficulty_hard">Difficile (1111-9999)</string>
 
-    <!-- Result Messages -->
-    <string name="result_format">Résultat : %d</string>
-    <string name="toast_correct">Excellent ! +10 points 🎉</string>
-    <string name="toast_wrong">Dommage ! Bonne réponse : %d</string>
-    <string name="toast_new_exercise">Nouvel exercice généré !</string>
-    <string name="toast_score_reset">Score réinitialisé</string>
-
-    <!-- History Format -->
-    <string name="history_item_format">%d %s %d = %d</string>
-    <string name="history_empty">Aucun historique</string>
-
-    <!-- Accessibility -->
+    <!-- Accessibility Descriptions -->
+    <string name="cd_difficulty_spinner">Sélecteur de difficulté</string>
     <string name="cd_number_one">Premier nombre</string>
     <string name="cd_number_two">Deuxième nombre</string>
     <string name="cd_operation_add">Addition</string>
     <string name="cd_operation_subtract">Soustraction</string>
     <string name="cd_operation_multiply">Multiplication</string>
     <string name="cd_generate_button">Générer un nouvel exercice</string>
-    <string name="cd_difficulty_spinner">Sélecteur de difficulté</string>
+
+    <!-- Buttons -->
+    <string name="btn_add">+</string>
+    <string name="btn_subtract">-</string>
+    <string name="btn_multiply">×</string>
+    <string name="btn_generate">Générer</string>
+    <string name="btn_reset_score">Réinitialiser</string>
+    <string name="btn_validate">✓</string> <!-- New Submit Button -->
+
+    <!-- UI Text -->
+    <string name="tv_result_placeholder">Sélectionnez une opération</string>
+    <string name="tv_history_label">Historique</string>
+    <string name="history_empty">Aucun calcul récent</string>
+    <string name="toast_new_exercise">Nouvel exercice généré !</string>
+    <string name="toast_score_reset">Score réinitialisé</string>
+    <string name="result_format">Résultat : %d</string>
+    <string name="hint_guess">Votre réponse...</string>
 </resources>
