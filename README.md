@@ -3,7 +3,7 @@
 > Une application Android éducative pour s'entraîner au calcul mental de manière ludique et interactive. 
 
 ## 🎬 Demo vidéo
-👉 [Voir la vidéo de démonstration]([https://your-link-here](https://drive.google.com/file/d/1FBR0o0WmbAH_zU0UddHUW44VR9QBt6am/view?usp=sharing))
+[▶️ Voir la démo]([https://your-link-here](https://drive.google.com/file/d/1FBR0o0WmbAH_zU0UddHUW44VR9QBt6am/view?usp=sharing))
 
 ## 📝 Description
 
